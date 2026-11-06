@@ -13,12 +13,33 @@
     <div id="app">
       <canvas id="canvas3d"></canvas>
 
-      <!-- Minimalist Gallery HUD -->
+      <!-- Minimalist Gallery Header -->
       <header class="hud-header">
         <div class="hud-brand">
-          <span class="hud-tag">MATHEMATICAL SCULPTURE</span>
+          <span class="hud-tag">GPU TOPOLOGICAL MORPHING</span>
           <h1 class="hud-title">Kinetic Monoliths</h1>
         </div>
+
+        <!-- Center Topological Shape Switcher -->
+        <div class="shape-switcher" id="shape-switcher">
+          <button class="shape-pill active" data-shape="0" title="Grade Harmônica de Chebyshev (Atalho: 1)">
+            <span class="shape-symbol">▤</span>
+            <span class="shape-name">Plano</span>
+          </button>
+          <button class="shape-pill" data-shape="1" title="Esfera Geodésica de Fibonacci (Atalho: 2)">
+            <span class="shape-symbol">◍</span>
+            <span class="shape-name">Esfera</span>
+          </button>
+          <button class="shape-pill" data-shape="2" title="Vórtice Toroidal em Curvatura (Atalho: 3)">
+            <span class="shape-symbol">◎</span>
+            <span class="shape-name">Toro</span>
+          </button>
+          <button class="shape-pill tour-pill" id="tour-btn" title="Ciclagem Contínua Automática (Atalho: T / Espaço)">
+            <span class="tour-beacon"></span>
+            <span class="shape-name">Tour Auto</span>
+          </button>
+        </div>
+
         <div class="hud-metrics">
           <div class="metric-pill">
             <span class="metric-dot" id="backend-dot"></span>
@@ -28,7 +49,7 @@
             <span id="fps-label">60 FPS</span>
           </div>
           <div class="metric-pill hide-on-mobile">
-            <span id="instances-label">1.600 Prismas</span>
+            <span id="instances-label">1.024 Prismas</span>
           </div>
         </div>
       </header>
@@ -37,7 +58,7 @@
       <footer class="hud-footer">
         <div class="interaction-hint">
           <span class="hint-icon">✦</span>
-          <span id="hint-text">Arraste para orbitar • Toque para gerar ondas radiais</span>
+          <span id="hint-text">Arraste para orbitar • Toque para ondas radiais • 1, 2, 3 para formas</span>
         </div>
         <div class="hud-actions">
           <button id="gyro-btn" class="hud-btn" title="Ativar Giroscópio (Mobile)">

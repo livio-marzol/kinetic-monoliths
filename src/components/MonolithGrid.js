@@ -15,6 +15,13 @@ export class MonolithGrid {
     this.geometry = null;
     this.material = null;
 
+    // Morphing transition management
+    this.currentShapeIndex = 0; // 0: Grid, 1: Sphere, 2: Torus
+    this.targetShapeIndex = 0;
+    this.isMorphing = false;
+    this.morphStartTime = 0;
+    this.morphDuration = 1.8;
+
     this.init();
   }
 
@@ -28,11 +35,11 @@ export class MonolithGrid {
     const { countX, countZ, spacing, monolithWidth, monolithHeight, monolithDepth } = this.config.grid;
     const totalCount = countX * countZ;
 
-    // Optimized Box geometry (1, 1, 1 segments: eliminates redundant vertices and reduces vertex shader workload)
+    // Optimized Box geometry (1, 1, 1: minimal vertex budget for maximum GPU throughput)
     this.geometry = new THREE.BoxGeometry(monolithWidth, monolithHeight, monolithDepth, 1, 1, 1);
 
-    // Coordinate attributes for GPU node shader: [x, distFromOrigin, z]
-    const instanceCoords = new Float32Array(totalCount * 3);
+    // Coordinate attributes for GPU node shader: [x, z, instanceIdx, distFromOrigin]
+    const instanceData = new Float32Array(totalCount * 4);
     const halfWidthX = ((countX - 1) * spacing) * 0.5;
     const halfWidthZ = ((countZ - 1) * spacing) * 0.5;
 
@@ -58,29 +65,73 @@ export class MonolithGrid {
         const posZ = r * spacing - halfWidthZ;
         const dist = Math.sqrt(posX * posX + posZ * posZ);
 
-        // Populate base matrix
-        dummy.position.set(posX, 0, posZ);
+        // Populate base matrix at origin
+        dummy.position.set(0, 0, 0);
         dummy.updateMatrix();
         this.mesh.setMatrixAt(idx, dummy.matrix);
 
         // Store coordinate in instance buffer for GPU shader
-        const attrIdx = idx * 3;
-        instanceCoords[attrIdx] = posX;
-        instanceCoords[attrIdx + 1] = dist;
-        instanceCoords[attrIdx + 2] = posZ;
+        const attrIdx = idx * 4;
+        instanceData[attrIdx] = posX;
+        instanceData[attrIdx + 1] = posZ;
+        instanceData[attrIdx + 2] = idx;
+        instanceData[attrIdx + 3] = dist;
 
         idx++;
       }
     }
 
-    this.geometry.setAttribute('aInstanceCoord', new InstancedBufferAttribute(instanceCoords, 3));
+    this.geometry.setAttribute('aInstanceData', new InstancedBufferAttribute(instanceData, 4));
     this.mesh.instanceMatrix.needsUpdate = true;
+    this.uniforms.uTotalInstances.value = totalCount;
 
     this.scene.add(this.mesh);
   }
 
+  /**
+   * Triggers smooth GPU morphing to a target topological form
+   * @param {number} targetIndex - 0: Grid, 1: Sphere, 2: Torus
+   * @param {number} duration - Transition duration in seconds
+   */
+  morphTo(targetIndex, duration = 1.8) {
+    if (targetIndex === this.currentShapeIndex && !this.isMorphing) {
+      return;
+    }
+
+    if (this.isMorphing) {
+      // Smoothly blend from current interpolated state
+      const currentVal = this.uniforms.uSourceShape.value + 
+        (this.uniforms.uTargetShape.value - this.uniforms.uSourceShape.value) * this.uniforms.uMorphProgress.value;
+      this.uniforms.uSourceShape.value = currentVal;
+    } else {
+      this.uniforms.uSourceShape.value = this.currentShapeIndex;
+    }
+
+    this.targetShapeIndex = targetIndex;
+    this.uniforms.uTargetShape.value = targetIndex;
+    this.uniforms.uMorphProgress.value = 0.0;
+    this.isMorphing = true;
+    this.morphStartTime = performance.now() * 0.001;
+    this.morphDuration = duration;
+  }
+
   update(time) {
     this.uniforms.uTime.value = time;
+
+    // Handle active morph progress
+    if (this.isMorphing) {
+      const elapsed = time - this.morphStartTime;
+      const progress = elapsed / this.morphDuration;
+
+      if (progress >= 1.0) {
+        this.uniforms.uMorphProgress.value = 1.0;
+        this.uniforms.uSourceShape.value = this.targetShapeIndex;
+        this.currentShapeIndex = this.targetShapeIndex;
+        this.isMorphing = false;
+      } else {
+        this.uniforms.uMorphProgress.value = Math.max(0.0, Math.min(1.0, progress));
+      }
+    }
   }
 
   triggerRipple(worldX, worldZ, currentTime) {
@@ -89,8 +140,8 @@ export class MonolithGrid {
   }
 
   setTheme(primaryHex, accentHex) {
-    this.uniforms.uPrimaryColor.value.set(primaryHex);
-    this.uniforms.uAccentColor.value.set(accentHex);
+    this.uniforms.uColor0Primary.value.set(primaryHex);
+    this.uniforms.uColor0Accent.value.set(accentHex);
   }
 
   rebuildGrid(countX, countZ) {

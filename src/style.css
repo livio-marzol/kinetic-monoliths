@@ -4,7 +4,8 @@
   --text-main: #f0f0f3;
   --text-muted: rgba(240, 240, 243, 0.55);
   --accent-gold: #e2ba7d;
-  --accent-teal: #4ee1c2;
+  --accent-cyan: #4ee1c2;
+  --accent-violet: #b66aff;
   --glass-bg: rgba(18, 18, 22, 0.65);
   --glass-border: rgba(255, 255, 255, 0.08);
   --glass-blur: 16px;
@@ -52,19 +53,21 @@ html, body {
   right: 20px;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   pointer-events: none;
   z-index: 10;
+  gap: 12px;
 }
 
 .hud-brand {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
+  min-width: 180px;
 }
 
 .hud-tag {
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   font-weight: 600;
   letter-spacing: 0.16em;
   color: var(--accent-gold);
@@ -72,17 +75,114 @@ html, body {
 }
 
 .hud-title {
-  font-size: 1.25rem;
+  font-size: 1.22rem;
   font-weight: 400;
   letter-spacing: -0.02em;
   color: var(--text-main);
   opacity: 0.95;
 }
 
+/* Center Topological Shape Switcher */
+.shape-switcher {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  pointer-events: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.shape-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.shape-symbol {
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.shape-pill:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Active states for each topological form */
+.shape-pill[data-shape="0"].active {
+  background: rgba(226, 186, 125, 0.14);
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+  box-shadow: 0 0 14px rgba(226, 186, 125, 0.25);
+}
+
+.shape-pill[data-shape="1"].active {
+  background: rgba(78, 225, 194, 0.14);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+  box-shadow: 0 0 14px rgba(78, 225, 194, 0.25);
+}
+
+.shape-pill[data-shape="2"].active {
+  background: rgba(182, 106, 255, 0.14);
+  border-color: var(--accent-violet);
+  color: var(--accent-violet);
+  box-shadow: 0 0 14px rgba(182, 106, 255, 0.25);
+}
+
+/* Auto Tour Pill */
+.tour-pill {
+  border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 999px !important;
+  margin-left: 2px;
+}
+
+.tour-beacon {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.tour-pill.active {
+  background: rgba(78, 225, 194, 0.18);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+.tour-pill.active .tour-beacon {
+  background: var(--accent-cyan);
+  box-shadow: 0 0 10px var(--accent-cyan);
+  animation: beacon-pulse 1.6s infinite ease-in-out;
+}
+
+@keyframes beacon-pulse {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  50% { transform: scale(1.35); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.6; }
+}
+
 .hud-metrics {
   display: flex;
   gap: 8px;
   align-items: center;
+  min-width: 180px;
+  justify-content: flex-end;
 }
 
 .metric-pill {
@@ -111,8 +211,8 @@ html, body {
 }
 
 .metric-dot.webgpu {
-  background: var(--accent-teal);
-  color: var(--accent-teal);
+  background: var(--accent-cyan);
+  color: var(--accent-cyan);
 }
 
 .metric-dot.webgl2 {
@@ -193,11 +293,11 @@ html, body {
 
 .hud-btn.active {
   background: rgba(78, 225, 194, 0.15);
-  border-color: var(--accent-teal);
-  color: var(--accent-teal);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
 }
 
-/* Custom Lil-GUI styling overrides for gallery aesthetics */
+/* Lil-GUI styling overrides */
 .lil-gui {
   --background-color: rgba(14, 14, 18, 0.82) !important;
   --text-color: #e5e5ea !important;
@@ -216,15 +316,34 @@ html, body {
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4) !important;
 }
 
-@media (max-width: 768px) {
-  .hud-title {
-    font-size: 1.05rem;
+/* Responsive layout adjustments for mobile */
+@media (max-width: 900px) {
+  .hud-header {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
   }
+  .hud-brand {
+    display: none; /* Hide brand text on mobile to make space for switcher */
+  }
+  .hud-metrics {
+    min-width: auto;
+  }
+  .shape-switcher {
+    order: -1;
+  }
+  .shape-pill {
+    padding: 6px 10px;
+    font-size: 0.72rem;
+  }
+}
+
+@media (max-width: 768px) {
   .hide-on-mobile {
     display: none;
   }
   .interaction-hint {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     padding: 6px 12px;
   }
   .hud-btn .btn-label {
@@ -234,6 +353,6 @@ html, body {
     padding: 8px 10px;
   }
   .lil-gui {
-    max-width: 260px !important;
+    max-width: 250px !important;
   }
 }
