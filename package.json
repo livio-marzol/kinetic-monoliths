@@ -1,0 +1,18 @@
+{
+  "name": "kinetic-monoliths-webgpu",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "three": "^0.187.0",
+    "lil-gui": "^0.20.0"
+  },
+  "devDependencies": {
+    "vite": "^6.0.0"
+  }
+}

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <title>Kinetic Monoliths — Three.js WebGPU / WGSL</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="canvas3d"></canvas>
+
+      <!-- Minimalist Gallery HUD -->
+      <header class="hud-header">
+        <div class="hud-brand">
+          <span class="hud-tag">MATHEMATICAL SCULPTURE</span>
+          <h1 class="hud-title">Kinetic Monoliths</h1>
+        </div>
+        <div class="hud-metrics">
+          <div class="metric-pill">
+            <span class="metric-dot" id="backend-dot"></span>
+            <span id="backend-label">Iniciando...</span>
+          </div>
+          <div class="metric-pill">
+            <span id="fps-label">60 FPS</span>
+          </div>
+          <div class="metric-pill hide-on-mobile">
+            <span id="instances-label">1.600 Prismas</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Bottom Interactive Hint & Controls -->
+      <footer class="hud-footer">
+        <div class="interaction-hint">
+          <span class="hint-icon">✦</span>
+          <span id="hint-text">Arraste para orbitar • Toque para gerar ondas radiais</span>
+        </div>
+        <div class="hud-actions">
+          <button id="gyro-btn" class="hud-btn" title="Ativar Giroscópio (Mobile)">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+              <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/>
+              <path d="M12 6v6l4 2"/>
+            </svg>
+            <span class="btn-label">Giroscópio</span>
+          </button>
+          <button id="reset-cam-btn" class="hud-btn" title="Resetar Câmera">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+              <path d="M3 3v5h5"/>
+            </svg>
+            <span class="btn-label">Reset</span>
+          </button>
+        </div>
+      </footer>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
