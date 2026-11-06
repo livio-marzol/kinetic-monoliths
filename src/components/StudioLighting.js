@@ -8,46 +8,53 @@ export class StudioLighting {
 
     this.lights = {};
     this.ground = null;
+    this.targetGroundY = -2.2;
     this.init();
   }
 
   init() {
-    // 1. Ambient Baseline (Soft, high-end gallery fill)
-    const ambientLight = new THREE.AmbientLight(0x1a1c24, 0.95);
+    // 1. Ambient Baseline (Atmospheric gallery tone)
+    const ambientLight = new THREE.AmbientLight(0x181a24, 1.1);
     this.scene.add(ambientLight);
     this.lights.ambient = ambientLight;
 
     // 2. Key Light (Warm Champagne Studio Light)
-    const keyLight = new THREE.DirectionalLight(0xfff3e2, 2.9);
+    const keyLight = new THREE.DirectionalLight(0xfff5e6, 3.0);
     keyLight.position.set(35, 45, 25);
     keyLight.castShadow = false; // Zero shadow-map pass overhead for maximum FPS
     this.scene.add(keyLight);
     this.lights.key = keyLight;
     this.defaultKeyPos = keyLight.position.clone();
 
-    // 3. Fill Light (Cool Slate Studio Softbox)
-    const fillLight = new THREE.DirectionalLight(0x7695c5, 1.4);
-    fillLight.position.set(-30, 25, -20);
+    // 3. Fill Light (Cool Slate Softbox)
+    const fillLight = new THREE.DirectionalLight(0x7695c5, 1.5);
+    fillLight.position.set(-35, 25, -20);
     this.scene.add(fillLight);
     this.lights.fill = fillLight;
 
     // 4. Rim Light (Grazing Backlight for Edge Definition)
-    const rimLight = new THREE.DirectionalLight(0x4ee1c2, 1.8);
-    rimLight.position.set(0, 32, -40);
+    const rimLight = new THREE.DirectionalLight(0x5eead4, 2.0);
+    rimLight.position.set(0, 35, -45);
     this.scene.add(rimLight);
     this.lights.rim = rimLight;
 
-    // 5. Studio Ground Plane with Procedural Ambient Occlusion (Contact Shadow)
+    // 5. Under-Light (Crucial Studio Uplight: Eliminates muddy black undersides on 3D Sphere & Torus)
+    const underLight = new THREE.DirectionalLight(0x2a3854, 1.8);
+    underLight.position.set(0, -35, 20);
+    this.scene.add(underLight);
+    this.lights.under = underLight;
+
+    // 6. Studio Ground Plane with Procedural Ambient Occlusion (Contact Shadow)
     // Runs in a single ultra-fast pass without requiring depth-buffer render passes
-    const groundGeo = new THREE.PlaneGeometry(260, 260);
+    const groundGeo = new THREE.PlaneGeometry(300, 300);
     const groundMat = new THREE.MeshBasicNodeMaterial();
     
     groundMat.colorNode = Fn(() => {
       // Radial distance from center on the floor plane
       const dist = length(positionLocal.xy);
       // Soft ambient contact shadow under the sculpture
-      const contactOcclusion = clamp(float(1.0).sub(dist.div(float(34.0))), float(0.0), float(1.0));
-      const darkenedFloor = mix(color(0x0a0a0d), color(0x030305), contactOcclusion.mul(0.8));
+      const contactOcclusion = clamp(float(1.0).sub(dist.div(float(38.0))), float(0.0), float(1.0));
+      const darkenedFloor = mix(color(0x0a0a0d), color(0x020204), contactOcclusion.mul(0.85));
       return darkenedFloor;
     })();
 
@@ -55,6 +62,17 @@ export class StudioLighting {
     this.ground.rotation.x = -Math.PI / 2;
     this.ground.position.y = -2.2;
     this.scene.add(this.ground);
+  }
+
+  /**
+   * Dynamically adjusts ground floor elevation based on active shape
+   * In Grid (shape 0), ground is at Y = -2.2 (right beneath grid).
+   * In Sphere/Torus, ground lowers to Y = -16.2 so the 3D sculpture floats gracefully above the floor.
+   */
+  update(shapeInterpolation) {
+    const is3D = Math.min(1.0, Math.max(0.0, shapeInterpolation));
+    this.targetGroundY = -2.2 + is3D * (-14.0);
+    this.ground.position.y += (this.targetGroundY - this.ground.position.y) * 0.08;
   }
 
   /**

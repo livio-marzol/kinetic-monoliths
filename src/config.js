@@ -1,7 +1,7 @@
 /**
  * Hardware-Aware Configuration for Kinetic Monoliths
  * Tuned for AMD Ryzen 4600G (Radeon Vega 7) and Moto G9 Power (Adreno 610)
- * Mode: Studio Pro (Optimized for rock-solid 60 FPS)
+ * Mode: Studio Pro with Perfect Center Framing
  */
 
 const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
@@ -24,9 +24,9 @@ export const CONFIG = {
 
   // Rendering & Performance Budget
   renderer: {
-    // Travar DPR em 1.0 elimina gargalos de fillrate e banda de memória DDR4 na Vega 7
+    // Trava DPR em 1.0 para manter 60 FPS cravados sem sobrecarregar a largura de banda
     maxDpr: 1.0,
-    shadows: false, // Desativa shadow maps dinâmicos caros em favor de sombra de contato suave
+    shadows: false, // Desativa shadow maps dinâmicos pesados em favor de oclusão analítica ultra-rápida
     antialias: true,
   },
 
@@ -44,18 +44,18 @@ export const CONFIG = {
 
   // Material & Color Themes
   theme: {
-    primaryColor: '#121217',    // Obsidian Slate base
-    accentColor: '#e2ba7d',     // Warm Champagne Gold
-    roughness: 0.32,
-    metalness: 0.82,
+    primaryColor: '#0e0e13',
+    accentColor: '#f0c986',
+    roughness: 0.28,
+    metalness: 0.85,
   },
 
-  // Camera Defaults
+  // Camera Defaults (Dead-Center Framing on Y = 0.0)
   camera: {
-    fov: 42,
+    fov: 40,
     near: 0.5,
-    far: 200,
-    defaultPos: isMobile ? [24, 28, 34] : [26, 30, 36],
-    target: [0, 1.0, 0],
+    far: 250,
+    defaultPos: isMobile ? [26, 20, 34] : [28, 22, 38],
+    target: [0, 0.0, 0], // Targets exact geometric center
   }
 };

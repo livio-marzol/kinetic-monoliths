@@ -52,9 +52,9 @@ class KineticApp {
     // 2. Scene & Subtle Depth Fog
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x0a0a0c);
-    this.scene.fog = new THREE.FogExp2(0x0a0a0c, 0.012);
+    this.scene.fog = new THREE.FogExp2(0x0a0a0c, 0.009);
 
-    // 3. Camera Setup
+    // 3. Camera Setup with Dead-Center Framing
     const aspect = window.innerWidth / window.innerHeight;
     this.camera = new THREE.PerspectiveCamera(CONFIG.camera.fov, aspect, CONFIG.camera.near, CONFIG.camera.far);
     this.camera.position.set(...CONFIG.camera.defaultPos);
@@ -244,13 +244,20 @@ class KineticApp {
     // 2. Update procedural wave displacement and morphing
     this.grid.update(elapsedTime);
 
-    // 3. Update camera dampening
+    // 3. Update ground elevation based on morph state
+    const morphProgress = this.grid.uniforms.uMorphProgress.value;
+    const sourceShape = this.grid.uniforms.uSourceShape.value;
+    const targetShape = this.grid.uniforms.uTargetShape.value;
+    const currentShapeVal = sourceShape + (targetShape - sourceShape) * morphProgress;
+    this.lighting.update(currentShapeVal);
+
+    // 4. Update camera dampening
     this.input.update();
 
-    // 4. Render frame via WebGPURenderer
+    // 5. Render frame via WebGPURenderer
     this.renderer.render(this.scene, this.camera);
 
-    // 5. Update FPS counter
+    // 6. Update FPS counter
     this.frameCount++;
     const now = performance.now();
     if (now - this.lastFpsUpdate >= 350) {
