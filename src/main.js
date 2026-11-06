@@ -11,7 +11,7 @@ class KineticApp {
     this.renderer = null;
     this.scene = null;
     this.camera = null;
-    this.clock = new THREE.Clock();
+    this.timer = new THREE.Timer();
 
     this.grid = null;
     this.lighting = null;
@@ -136,7 +136,7 @@ class KineticApp {
       this.tourBtn.classList.toggle('active', this.isTourActive);
     }
     if (this.isTourActive) {
-      this.lastTourSwitch = this.clock.getElapsedTime();
+      this.lastTourSwitch = this.timer.getElapsed();
     }
   }
 
@@ -230,7 +230,8 @@ class KineticApp {
   }
 
   render() {
-    const elapsedTime = this.clock.getElapsedTime();
+    this.timer.update();
+    const elapsedTime = this.timer.getElapsed();
 
     // 1. Auto Tour choreography loop
     if (this.isTourActive && !this.grid.isMorphing) {

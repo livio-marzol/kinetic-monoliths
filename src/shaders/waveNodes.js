@@ -19,6 +19,8 @@ import {
   smoothstep,
   normalize,
   cross,
+  floor,
+  mod,
   positionLocal,
   normalLocal,
   normalView,
@@ -155,8 +157,8 @@ export function createKineticDisplacementNode(uniforms) {
     // 3. SHAPE 2: VIBRANT TOROIDAL VORTEX (CENTERED AT Y = 0.0)
     // ==========================================
     // Seamless 2D grid parameterization (u, v) mapped to torus surface
-    const colTorus = idx.remainder(countX);
-    const rowTorus = idx.div(countX);
+    const colTorus = idx.mod(countX);
+    const rowTorus = floor(idx.div(countX));
 
     const angleU = colTorus.div(countX).mul(float(6.2831853)).add(uniforms.uTime.mul(0.45));
     const angleV = rowTorus.div(countZ).mul(float(6.2831853)).add(uniforms.uTime.mul(0.9));
