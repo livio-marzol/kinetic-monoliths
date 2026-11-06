@@ -54,10 +54,12 @@ class KineticApp {
     this.scene.background = new THREE.Color(0x0a0a0c);
     this.scene.fog = new THREE.FogExp2(0x0a0a0c, 0.009);
 
-    // 3. Camera Setup with Dead-Center Framing
+    // 3. Camera Setup with Dead-Center Framing & Portrait Compensation
     const aspect = window.innerWidth / window.innerHeight;
     this.camera = new THREE.PerspectiveCamera(CONFIG.camera.fov, aspect, CONFIG.camera.near, CONFIG.camera.far);
-    this.camera.position.set(...CONFIG.camera.defaultPos);
+    const [dx, dy, dz] = CONFIG.camera.defaultPos;
+    const portraitMultiplier = aspect < 1.0 ? Math.max(1.0, 0.92 / aspect) : 1.0;
+    this.camera.position.set(dx * portraitMultiplier, dy * portraitMultiplier, dz * portraitMultiplier);
 
     // 4. Initialize Core Components
     this.grid = new MonolithGrid(this.scene, CONFIG);
@@ -221,9 +223,18 @@ class KineticApp {
   onWindowResize() {
     const width = window.innerWidth;
     const height = window.innerHeight;
+    const aspect = width / height;
 
     this.camera.aspect = width / height;
+    const [dx, dy, dz] = CONFIG.camera.defaultPos;
+    const portraitMultiplier = aspect < 1.0 ? Math.max(1.0, 0.92 / aspect) : 1.0;
+    this.camera.position.set(dx * portraitMultiplier, dy * portraitMultiplier, dz * portraitMultiplier);
     this.camera.updateProjectionMatrix();
+
+    if (this.input?.controls) {
+      this.input.controls.target.set(...CONFIG.camera.target);
+      this.input.controls.update();
+    }
 
     this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, CONFIG.renderer.maxDpr));

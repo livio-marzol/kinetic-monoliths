@@ -135,7 +135,9 @@ export class InputController {
 
   resetCamera() {
     const [dx, dy, dz] = this.config.camera.defaultPos;
-    this.camera.position.set(dx, dy, dz);
+    const aspect = window.innerWidth / window.innerHeight;
+    const portraitMultiplier = aspect < 1.0 ? Math.max(1.0, 0.92 / aspect) : 1.0;
+    this.camera.position.set(dx * portraitMultiplier, dy * portraitMultiplier, dz * portraitMultiplier);
     this.controls.target.set(...this.config.camera.target);
     this.controls.update();
   }
