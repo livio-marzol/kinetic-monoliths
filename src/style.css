@@ -303,28 +303,59 @@ html, body {
   color: var(--accent-cyan);
 }
 
-/* Lil-GUI styling & positioning:
-   On desktop, docks neatly BELOW the header metrics (top: 72px) so it never collides! */
-.lil-gui {
+/* Lil-GUI root container styling */
+.lil-gui.root {
   position: fixed !important;
   top: 72px !important;
   right: 20px !important;
-  z-index: 20 !important;
-  --background-color: rgba(14, 14, 18, 0.88) !important;
+  z-index: 50 !important;
+  width: var(--width, 260px) !important;
+  border-radius: 14px !important;
+  border: 1px solid var(--glass-border) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5) !important;
+  pointer-events: auto !important;
+}
+
+/* Global Lil-GUI Theme Variables */
+.lil-gui {
+  --background-color: rgba(14, 14, 18, 0.92) !important;
   --text-color: #e5e5ea !important;
-  --title-background-color: rgba(24, 24, 30, 0.95) !important;
+  --title-background-color: rgba(22, 22, 28, 0.96) !important;
   --widget-color: rgba(36, 36, 44, 0.85) !important;
   --hover-color: rgba(56, 56, 68, 0.9) !important;
   --focus-color: #4ee1c2 !important;
   --number-color: #4ee1c2 !important;
   --string-color: #e2ba7d !important;
   font-family: var(--font-family) !important;
-  border-radius: 12px !important;
-  overflow: hidden !important;
-  border: 1px solid var(--glass-border) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45) !important;
+}
+
+/* Crucial: Child folders inside the root GUI MUST NOT be fixed or bordered */
+.lil-gui .lil-gui {
+  position: static !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  z-index: auto !important;
+  pointer-events: auto !important;
+}
+
+/* Scrollable children area */
+.lil-gui.root > .children {
+  max-height: calc(100vh - 160px) !important;
+  overflow-y: auto !important;
+}
+
+/* Ensure title bars are always interactive with pointer cursor */
+.lil-gui .title {
+  cursor: pointer !important;
+  user-select: none !important;
+  pointer-events: auto !important;
 }
 
 /* ========================================================
@@ -382,12 +413,18 @@ html, body {
   }
 
   /* Moves Lil-GUI to the bottom-right so it NEVER covers the top switcher pills */
-  .lil-gui {
+  .lil-gui.root {
     top: auto !important;
     bottom: 74px !important;
-    right: 14px !important;
-    max-width: 220px !important;
-    z-index: 25 !important;
+    right: 12px !important;
+    width: 250px !important;
+    max-width: calc(100vw - 24px) !important;
+    z-index: 50 !important;
+  }
+
+  .lil-gui.root > .children {
+    max-height: calc(100vh - 200px) !important;
+    overflow-y: auto !important;
   }
 
   .interaction-hint {

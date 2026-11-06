@@ -84,6 +84,8 @@ export class MonolithGrid {
     this.geometry.setAttribute('aInstanceData', new InstancedBufferAttribute(instanceData, 4));
     this.mesh.instanceMatrix.needsUpdate = true;
     this.uniforms.uTotalInstances.value = totalCount;
+    this.uniforms.uCountX.value = countX;
+    this.uniforms.uCountZ.value = countZ;
 
     this.scene.add(this.mesh);
   }

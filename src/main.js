@@ -155,9 +155,11 @@ class KineticApp {
   }
 
   setupGUI() {
-    this.gui = new GUI({ title: 'Parâmetros Cinéticos', closeFolders: true });
+    this.gui = new GUI({ title: 'Parâmetros Cinéticos' });
     if (isMobile) {
       this.gui.close(); // Start collapsed on mobile screens
+    } else {
+      this.gui.open();
     }
 
     // Topologies & Morphing folder
